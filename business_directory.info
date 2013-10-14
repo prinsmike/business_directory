@@ -1,5 +1,4 @@
 core = "7.x"
-dependencies[] = "content_complete"
 dependencies[] = "email"
 dependencies[] = "features"
 dependencies[] = "image"
