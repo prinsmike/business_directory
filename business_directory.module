@@ -1,0 +1,120 @@
+<?php
+/**
+ * @file
+ * Code for the Business Directory feature.
+ */
+
+include_once('business_directory.features.inc');
+
+/**
+ * Implements hook_block_info().
+ */
+function business_directory_block_info() {
+  $blocks['add_business_button'] = array(
+    'info'        =>  t('Add your business'),
+    'status'      =>  TRUE,
+    'region'      =>  'content',
+    'weight'      =>  -10,
+    'visibility'  =>  BLOCK_VISIBILITY_NOTLISTED,
+    );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function business_directory_block_view($delta = '') {
+  switch ($delta) {
+    case 'add_business_button':
+    $block['subject'] = t('');
+    $block['content'] = theme('add_business_block');
+    return $block;
+    break;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function business_directory_theme($existing, $type, $theme, $path) {
+  return array(
+    'add_business_block' => array(
+      'path' => drupal_get_path('module', 'business_directory') . '/theme',
+      'template' => 'business-directory-add-business-block',
+      ),
+    );
+}
+
+/**
+ * Implementing hook_form_CONTENTTYPE_node_form_alter.
+ */
+function business_directory_form_business_node_form_alter(&$form, &$form_state, $form_id) {
+  $form['#validate'][] = '_business_directory_check_duplicates';
+  if (!user_access('administer nodes')) {
+    $form['group_group']['#access'] = FALSE;
+    
+    //hide option for public/private groups
+    $form['group_access']['#access'] = FALSE;
+    
+    //hide the groups box for assigning content
+    $form['group_audience']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implementing hook_og_permission().
+ */
+function business_directory_og_permission_alter(&$perms) {
+  $perms['subscribe without approval']['roles'] = array(OG_ANONYMOUS_ROLE);
+  $perms['view body field']['roles'] = array(OG_ANONYMOUS_ROLE, OG_AUTHENTICATED_ROLE, OG_ADMINISTRATOR_ROLE);
+}
+
+/**
+ * Validation: Check for duplicate business directory entries.
+ */
+function _business_directory_check_duplicates($form, &$form_state) {
+  if (arg(2) != 'edit') {
+  // Check if the phone number isn't in the database already.
+    foreach ($form_state['values']['field_phone'] as $phone) {
+      $query = db_select('field_data_field_phone', 'p')
+      ->fields('p', array('field_phone_value'))
+      ->condition('field_phone_value', $phone[0]['value'], '=')
+      ->execute()
+      ->fetchAssoc();
+      if ($query) {
+        form_set_error('field_phone', 
+          t('The phone number is already in the database. There may already be an entry for this business.'));
+      }
+    }
+    
+  // Check if the email address isn't in the database already.
+    foreach ($form_state['values']['field_email_address'] as $email) {
+      if ($email[0]['email'] != '') {
+        $query = db_select('field_data_field_email_address', 'e')
+        ->fields('e', array('field_email_address_email'))
+        ->condition('field_email_address_email', $email[0]['email'], '=')     
+        ->execute()
+        ->fetchAssoc();
+        if ($query) {
+          form_set_error('field_email_address',
+            t('The email address is already in the database. There may already be an entry for this business.'));
+        }
+      }
+    }
+    
+  // Check if the website address isn't in the database already.
+    foreach ($form_state['values']['field_website'] as $site) {
+      if (isset($email[0]['url'])) {
+        $query = db_select('field_data_field_website', 'e')
+        ->fields('e', array('field_website_url'))
+        ->condition('field_website_url', $email[0]['url'], '=')
+        ->execute()
+        ->fetchAssoc();
+        if ($query) {
+          form_set_error('field_website',
+            t('The website address is already in the database. There may already be an entry for this business.'));
+        }
+      }
+    }
+  }
+}

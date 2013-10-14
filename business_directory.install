@@ -1,0 +1,346 @@
+<?php
+
+/**
+
+ * Implementation of hook_install.
+ */
+function business_directory_install() {
+  // Install Business Directory vocabulary.
+  _business_directory_install_vocabulary();
+  // Install Business Directory taxonomy terms.
+  _business_directory_install_terms();
+  // Setup Business Directory variables.
+  _business_directory_install_variables();
+  // Setup Business Directory permissions.
+  _business_directory_install_permissions();
+}
+
+function _business_directory_install_variables() {
+  variable_set('pathauto_node_business_pattern', 'business-directory/business/[node:title]');
+}
+
+function _business_directory_install_vocabulary() {
+  $description = st('Organize businesses into business directories.');
+  $help = st('Select all directories where you would like to place this business.');
+  $vocabulary = (object) array(
+    'name' => 'Business Directories',
+    'description' => $description,
+    'machine_name' => 'business_directories',
+    'help' => $help,
+  );
+  taxonomy_vocabulary_save($vocabulary);
+}
+
+function _business_directory_install_terms() {
+  $vocabs = taxonomy_get_vocabularies();
+  foreach ($vocabs as $vocab) {
+    if ($vocab->name == 'Business Directories') {
+      $vocab_id = $vocab->vid;
+    }
+  }
+  
+  $directories = array(
+'Accommodation',
+'Accountants, Auditors & Bookkeeping',
+'Advertising Agencies',
+'Agriculture',
+'Air Compressor Services',
+'Air-Conditioning',
+'Aluminium and Glass',
+'Architects',
+'Art Galleries, Art Paintings & Framing',
+'Arts and Entertainment',
+'Attorneys',
+'Auctioneers',
+'Audio Equipment Sale & Rental',
+'Auto Electronics',
+'Automotive Accessories',
+'Automotive Sales',
+'Automotive Spares',
+'Baking, Bakeries & Cakes',
+'Banks',
+'Beauty Salons & Health Clinics',
+'Bedding',
+'Bikes & Motorcycles',
+'Blasting Contractors',
+'Blinds & Awnings',
+'Bond Originators',
+'Bookstores - Christian',
+'Brick Suppliers',
+'Broadcasting',
+'Building Contractors',
+'Building Materials',
+'Business Brokers',
+'Business Consultants',
+'Business Finance',
+'Business Management',
+'Business Travel',
+'Butcheries',
+'Camping & Outdoor Equipment',
+'Canopies & Accessories',
+'Car Rentals',
+'Car Wash',
+'Carpenters',
+'Carpets & Decor',
+'Cash Loans',
+'Caterers & Event Management',
+'Catering Equipment',
+'Ceilings & Dry walling',
+'Cellular Services',
+'Cement & Concrete Products',
+'Cement & Concrete Pumping Equipment',
+'Charters & Flight Training',
+'Chemicals',
+'Christian Bookshops',
+'Churches',
+'Civil Engineering',
+'Classifieds',
+'Cleaning Equipment',
+'Cleaning Services',
+'Clothing',
+'Clubs',
+'Clutches & Brakes',
+'Coffee Shops',
+'Coffin & Tombstone Manufacture',
+'Community Organisations',
+'Computer Supplies & Services',
+'Computer Training for Children',
+'Conference Venues',
+'Construction',
+'Copy Centres',
+'Courier Services',
+'Dancing Studios',
+'Day-Care Children',
+'Debt Collections',
+'Debt Counselling',
+'Décor',
+'Decorative Concrete Coating',
+'Dental Health',
+'Distribution/Distributors',
+'Doctors - Medical Practitioners',
+'Drug & Alcohol Centre',
+'Earthmoving Equipment',
+'Educational Institutions',
+'Electric Fencing',
+'Electrical Appliances, Services & Suppliers',
+'Electrical Fencing & Gates',
+'Electricians & Electrical Contractors',
+'Electronics',
+'Emergency Services',
+'Employment Agencies',
+'Engineering Draughting',
+'Engineers Engineering',
+'Entertainment',
+'Environmental Consultancy',
+'Estate Agents',
+'Event Management & Promotions',
+'Fast Foods',
+'Fencing - Game Farm & Security',
+'Financial Institutions',
+'Financial Services',
+'Fire Fighting',
+'Fire Prevention Consulting',
+'Firearm Training',
+'Flooring',
+'Florists',
+'Forklifts',
+'Fruit & Vegetable Wholesalers',
+'Fruit & Vegetables Retailers',
+'Fruit Juice Distribution & Manufacture',
+'Function Hire',
+'Funeral Services',
+'Furniture Dealers',
+'Furniture Removals',
+'Game Farm Fencing',
+'Game Reserves',
+'Garage Doors',
+'Garden Centres, Gardening Services & Nurseries',
+'Garment and Linen Rental',
+'Gas & Appliances',
+'Gearboxes & Diff\'s Repair',
+'General Retail & Wholesalers',
+'Generators Diesel Manufacture & Supply',
+'Gifts',
+'Glass & Aluminium',
+'Government Departments',
+'Graphic Design & Sign Writing',
+'Gyms Fitness & Lifestyle Centres',
+'Hair Salons',
+'Handyman',
+'Hardware',
+'Health Shop',
+'Hi-Fi & Digital Equipment',
+'Home Improvements',
+'Hospitals',
+'Hotels',
+'Human Resources',
+'Hunting Safari Operators',
+'Hygiene and Sanitary ware',
+'Ice Suppliers',
+'Information Technology',
+'Insurance Brokers',
+'Internet Service Provider',
+'Intgerior Design',
+'Irrigation Systems',
+'Jewellers - Jewellery',
+'Kitchen & Cupboards',
+'Labour Consultants',
+'Land Surveyors',
+'Landscaping/Gardening',
+'Laundry Services',
+'Lawn (Instant) Maintenance',
+'Leather Suppliers',
+'Liquor Outlets/Bottle Stores',
+'Locksmiths',
+'Lottery',
+'Luggage & Accessories',
+'Manufacturers',
+'Marketing & Promotions',
+'Martial Arts & Karate',
+'Meat Products & Wholesalers',
+'Medical Aid Brokers',
+'Medical Practitioners',
+'Mines & Mining Supplies',
+'Model & Scouting Agency',
+'Mogtorcycles, Bikes & Scooters',
+'Motor Dealers',
+'Municipality',
+'Music Retailers',
+'Nail & Nail Training - Beauty Salons',
+'Newspapers and Publications',
+'Nurseries Garden Landscaping',
+'Occupational Health and Safety',
+'Office Furniture Supplies & Stationary',
+'Old Age Homes',
+'Opportunities',
+'Optometrists',
+'Packaging Suppliers & Manufacture',
+'Paints & Chemical Suppliers',
+'Panel Beaters',
+'Paristatal',
+'Paving & Precast',
+'Payroll Solutions',
+'Personnel Agencies',
+'Petrol Stations',
+'Pharmacies',
+'Photographic Services',
+'Plant, Tools & Equipment Hire',
+'Plumbing & Supplies',
+'Polygraph Services',
+'Pools',
+'Postal Services',
+'Pottery',
+'Power Tools',
+'Printing & Sign Writing',
+'Private Investigators',
+'Project Management',
+'Property Development',
+'Property Finance',
+'Publishing',
+'Pubs & Grills',
+'Pumping Equipment',
+'Quantity Surveyors',
+'Real Estate',
+'Recruitment Agencies',
+'Repairs Appliances',
+'Restaurants',
+'Retail',
+'Risk Management & Insurance Services',
+'Safety Equipment',
+'Sand & Stone',
+'Schools High',
+'Schools Nursery',
+'Schools Primary',
+'Scooters & Motorcycles',
+'Security Gates & Fencing',
+'Security Services & Systems',
+'Service Workshops',
+'Shop fittings',
+'Shopping Centres',
+'Sign Writing',
+'Soft Drinks',
+'Solar Power Water Heaters',
+'Sports Massage',
+'Steam Valves & Plants',
+'Steel Manufacturers',
+'Supermarkets',
+'Sweets',
+'Taxi Services',
+'Telecommunications',
+'Tent Hire',
+'Thatching',
+'Tiling Tile Suppliers',
+'Timber Products',
+'Tourist Information',
+'Town Planners',
+'Toys and Hobbies',
+'Tractors',
+'Trade & Investments',
+'Trailers & Bodies',
+'Training and Development',
+'Training and Schools',
+'Transport & Commuter Travel',
+'Transport Contractors',
+'Travel Agencies',
+'Truck Sales & Services',
+'Tyre Fitment Centres',
+'Universities',
+'Vehicle Dealers',
+'Vehicle Recovery',
+'Vehicle Repairs, Services & Workshops',
+'Ventilation',
+'Vets & Animal Care',
+'Video Production Services',
+'Video Rental',
+'Water Purifiers Systems',
+'Waterproofing & Roof Repairs',
+'Weddings & Related Services',
+'Wholesalers',
+'Windscreens',
+  );
+  
+  foreach($directories as $directory) {
+    $term = new stdClass();
+    $term->name = $directory;
+    $term->vid = $vocab_id;
+    taxonomy_term_save($term);
+  }
+}
+
+function _business_directory_install_permissions() {
+  $manager_role = user_role_load_by_name('Manager');
+  $admin_role = user_role_load_by_name('Administrator');
+
+  $vocabs = taxonomy_get_vocabularies();
+  foreach ($vocabs as $vocab) {
+    if ($vocab->name == 'Business Directories') {
+      $vocab_id = $vocab->vid;
+    }
+  }
+
+  $admin_perms = array(
+    'create business content' => TRUE,
+    'edit own business content' => TRUE,
+    'edit any business content' => TRUE,
+    'delete own business content' => TRUE,
+    'delete any business content' => TRUE,
+    'edit terms in '.$vocab_id => TRUE,
+    'delete terms in '.$vocab_id => TRUE,
+  );
+  $user_perms = array(
+    'create business content' => TRUE,
+    'edit own business content' => TRUE,
+    'delete own business content' => TRUE,
+  );
+  user_role_change_permissions($manager_role->rid, $admin_perms);
+  user_role_change_permissions($admin_role->rid, $admin_perms);
+  user_role_change_permissions(DRUPAL_AUTHENTICATED_RID, $user_perms);
+}
+
+function business_directory_update_7101() {
+  _business_directory_install_variables();
+}
+
+function business_directory_update_7102() {
+  _business_directory_install_permissions();
+}
